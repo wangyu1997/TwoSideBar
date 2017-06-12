@@ -7,7 +7,7 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class DrawerController: UIViewController {
 
     /**
      *将建好的三个viewcontroller贴在一起
@@ -21,21 +21,22 @@ class ViewController: UIViewController {
     var maxWith:CGFloat?
     var spaceWidth:CGFloat?
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    
+    init(mainVC:UINavigationController,leftVC:UIViewController,rightVC:UIViewController){
+        super.init(nibName: nil, bundle: nil)
         
         spaceWidth = 60.0
         screenWidth = UIScreen.main.bounds.size.width
         maxWith = screenWidth!-spaceWidth!
         
-        self.leftVC = LeftTableViewController()
+        self.mainVC = mainVC
+        self.leftVC = leftVC
+        self.rightVC = rightVC
         
-        let rootVC = MainViewController()
-        self.mainVC = UINavigationController(rootViewController: rootVC)
-        
-        self.rightVC = RightTableViewController()
-        
-        mainVC?.view.backgroundColor = .orange
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
         
         self.view.addSubview((leftVC?.view)!)
         self.view.addSubview((rightVC?.view)!)
@@ -49,36 +50,7 @@ class ViewController: UIViewController {
         self.mainVC?.view.addGestureRecognizer(pan)
     }
     
-    func panAction(_ pan:UIPanGestureRecognizer) {
-        let offsetX = pan.translation(in: pan.view).x
-        
-        if offsetX>0{
-            if pan.state == .changed && offsetX <= maxWith! {
-                mainVC?.view.transform = CGAffineTransform(translationX: offsetX, y: 0)
-                leftVC?.view.transform = CGAffineTransform(translationX: -self.maxWith!+offsetX, y: 0)
-            }else if pan.state == .failed || pan.state == .ended || pan.state == .cancelled{
-                if offsetX>=maxWith!/3 {
-                    openLeftSide()
-                }else{
-                    closeLeftSide()
-                }
-            }
-        }else{
-            if pan.state == .changed && offsetX <= maxWith! {
-                mainVC?.view.transform = CGAffineTransform(translationX: offsetX, y: 0)
-                rightVC?.view.transform = CGAffineTransform(translationX:self.maxWith!+offsetX, y: 0)
-            }else if pan.state == .failed || pan.state == .ended || pan.state == .cancelled{
-                if -offsetX>=maxWith!/3 {
-                    openRightSide()
-                }else{
-                   closeRightSide()
-                }
-            }
-
-        }
-    }
-    
-    
+    //Mark -打开左侧滑
     func openLeftSide() {
         UIView.animate(withDuration: 0.25, animations: {
             self.mainVC?.view.transform = CGAffineTransform(translationX: self.maxWith!, y: 0)
@@ -88,7 +60,8 @@ class ViewController: UIViewController {
             self.mainVC?.view.addSubview(self.coverBtn)
         }
     }
-    
+
+    //Mark -关闭左侧滑
     func closeLeftSide() {
         UIView.animate(withDuration: 0.25, animations: {
             self.leftVC?.view.transform = CGAffineTransform(translationX: -self.maxWith!, y: 0)
@@ -99,6 +72,7 @@ class ViewController: UIViewController {
         }
     }
     
+    //Mark -打开右侧滑
     func openRightSide() {
         UIView.animate(withDuration: 0.25, animations: {
             self.mainVC?.view.transform = CGAffineTransform(translationX: -self.maxWith!, y: 0)
@@ -109,6 +83,7 @@ class ViewController: UIViewController {
         }
     }
     
+    //Mark -关闭右侧滑
     func closeRightSide() {
         UIView.animate(withDuration: 0.25, animations: {
             self.rightVC?.view.transform = CGAffineTransform(translationX: self.maxWith!, y: 0)
@@ -119,24 +94,7 @@ class ViewController: UIViewController {
         }
     }
     
-    func showMainView() {
-        UIView.animate(withDuration: 0.25){
-            self.mainVC?.view.center = CGPoint(x: UIScreen.main.bounds.size.width/2, y:UIScreen.main.bounds.size.height/2 )
-        }
-    }
-    
-    func showLeftView(){
-        UIView.animate(withDuration: 0.25){
-            self.mainVC?.view.center = CGPoint(x: UIScreen.main.bounds.size.width * 1.5-60, y:UIScreen.main.bounds.size.height/2 )
-        }
-    }
-    
-    func showRightView(){
-        UIView.animate(withDuration: 0.25){
-            self.mainVC?.view.center = CGPoint(x:60-UIScreen.main.bounds.size.width/2, y:UIScreen.main.bounds.size.height/2 )
-        }
-    }
-    
+    //Mark -关闭侧滑
     func closeSide() {
         if (mainVC?.view.frame.origin.x)! > CGFloat(0){
             closeLeftSide()
@@ -150,7 +108,7 @@ class ViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
-    
+    //Mark -遮盖层滑动手势
     func panBtnAction(_ pan:UIPanGestureRecognizer) {
         let offsetX = pan.translation(in: pan.view).x
 
@@ -185,10 +143,40 @@ class ViewController: UIViewController {
         }
     }
     
+    //Mark -主界面滑动手势
+    func panAction(_ pan:UIPanGestureRecognizer) {
+        let offsetX = pan.translation(in: pan.view).x
+        
+        if offsetX>0{
+            if pan.state == .changed && offsetX <= maxWith! {
+                mainVC?.view.transform = CGAffineTransform(translationX: offsetX, y: 0)
+                leftVC?.view.transform = CGAffineTransform(translationX: -self.maxWith!+offsetX, y: 0)
+            }else if pan.state == .failed || pan.state == .ended || pan.state == .cancelled{
+                if offsetX>=maxWith!/3 {
+                    openLeftSide()
+                }else{
+                    closeLeftSide()
+                }
+            }
+        }else{
+            if pan.state == .changed && offsetX <= maxWith! {
+                mainVC?.view.transform = CGAffineTransform(translationX: offsetX, y: 0)
+                rightVC?.view.transform = CGAffineTransform(translationX:self.maxWith!+offsetX, y: 0)
+            }else if pan.state == .failed || pan.state == .ended || pan.state == .cancelled{
+                if -offsetX>=maxWith!/3 {
+                    openRightSide()
+                }else{
+                    closeRightSide()
+                }
+            }
+            
+        }
+    }
 
-    
+
+    //Mark -遮盖层
     private lazy var coverBtn: UIButton = {
-        let button = UIButton(frame: CGRect(origin: CGPoint(x:0,y:0), size: UIScreen.main.bounds.size))
+        let button = UIButton(frame: UIScreen.main.bounds)
         button.backgroundColor = .black
         button.alpha = 0.2
         button.addTarget(self, action: #selector(closeSide), for: .touchUpInside)
@@ -196,5 +184,9 @@ class ViewController: UIViewController {
         return button
     }()
 
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
 }
 

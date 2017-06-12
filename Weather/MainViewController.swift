@@ -13,9 +13,6 @@ class MainViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.title = "麦子学院"
-        
-        self.view.backgroundColor = .green
         // Do any additional setup after loading the view.
     }
 
